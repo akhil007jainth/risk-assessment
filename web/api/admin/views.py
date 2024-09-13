@@ -4,16 +4,16 @@ from flask_restx import Resource
 from app import api
 from lib.general_utils import data_envelope
 from lib.utils import format_response
-from web.api.user import parser
-from web.api.user.serializer import user_serializer
+from web.api.admin import parser
+from web.api.admin.serializer import user_serializer
 from web.models.main import User, WebhookClient
 
 ns = api.namespace('admin', description='User Admin')
 
 
 @ns.route('/init')
-class UserClient(Resource):
-    """User"""
+class AdminClient(Resource):
+    """Admin"""
 
     @ns.expect(parser.user_parser)
     @ns.marshal_with(data_envelope(user_serializer))
@@ -33,7 +33,7 @@ class UserClient(Resource):
         return format_response(client, 200, "success")
 
 
-@ns.route('/get-user')
+@ns.route('/get-admin')
 class UserList(Resource):
     def get(self):
         """Get Users List"""
