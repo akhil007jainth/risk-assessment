@@ -1,7 +1,6 @@
 import string
 import random
 
-
 def format_response(data, status_code, message=None, custom_ob=None, message_code_class=None, save=True):
     message_code = None
     if data is not None:
@@ -56,4 +55,3 @@ def format_response(data, status_code, message=None, custom_ob=None, message_cod
 def generate_id(prepend_string):
     charset = string.ascii_lowercase + string.ascii_letters
     return prepend_string + "_" + "".join([random.choice(charset) for _ in range(20)])
-
