@@ -1,8 +1,7 @@
-
-
 from flask import Flask
 from flask_restx import Api, Resource, fields, reqparse
 from app import app, api
+
 
 def data_envelope(nested_model, as_list=False, skip_none=False):
     nested_model = fields.Nested(model=nested_model, description="Nested Model", allow_null=True, skip_none=skip_none)
