@@ -19,7 +19,7 @@ class UploadPdf(Resource):
 
     # API for Initialize User
     @ns.expect(parser)
-    def get(self):
+    def post(self):
         # Parse arguments from the request
         args = parser.parse_args()
         pdf_file = args['file']
