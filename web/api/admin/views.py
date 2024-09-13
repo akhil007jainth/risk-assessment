@@ -19,13 +19,13 @@ class AdminClient(Resource):
     @ns.marshal_with(data_envelope(user_serializer))
     def post(self):
         args = parser.user_parser.parse_args()
-        username = args["name"]
+        full_name = args["name"]
         email = args["email"]
 
         client = User()
         user_id = client.generate_id()
         client.user_id = user_id
-        client.username = username
+        client.full_name = full_name
         client.email = email
         if User.objects(email=email).first():
             return format_response(None, 422, "fail", custom_ob="User Already Exits")
@@ -38,14 +38,14 @@ class UserList(Resource):
     def get(self):
         """Get Users List"""
 
-        users = User.objects.only('username', 'email')
-        user_list = [{'username': user.username, 'email': user.email} for user in users]
+        users = User.objects.only('full_name', 'email')
+        user_list = [{'full_name': user.full_name, 'email': user.email} for user in users]
 
         return format_response(None, 200, "success", custom_ob=user_list)
 
 
-@ns.route('/submit')
-class Submit(Resource):
+@ns.route('/webhook')
+class Webhook(Resource):
     def get(self):
         """Result"""
 

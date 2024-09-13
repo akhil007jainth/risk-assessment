@@ -7,7 +7,7 @@ class User(Document):
     prepend_string = "user"
 
     user_id = StringField(required=True, unique=True)
-    username = StringField(required=True)
+    full_name = StringField(required=True)
     email = StringField(required=True, unique=True)
     created_at = DateTimeField(default=datetime.utcnow)
     status = StringField()
