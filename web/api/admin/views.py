@@ -1,35 +1,58 @@
-from flask import Flask
-from flask_restx import Api, Resource, fields, reqparse
-from app import app, api
-from lib.utils import format_response
+from flask import request
+from flask_restx import Resource
+
+from app import api
 from lib.general_utils import data_envelope
-from web.models.main import User
+from lib.utils import format_response
+from web.api.admin import parser
+from web.api.admin.serializer import user_serializer
+from web.models.main import User, WebhookClient
 
-ns = api.namespace('todos', description='Todo operations')
-
-# Define the response model for serialization
-todo_model = api.model('Todo', {
-    'name': fields.String(required=True, description='The todo item'),
-})
-
-# Create a request parser for input data
-parser = reqparse.RequestParser()
-parser.add_argument('name', type=str, required=True, help='Name of the todo item')
-
+ns = api.namespace('admin', description='User Admin')
 
 
 @ns.route('/init')
-class TodoResource(Resource):
-    '''Show a single todo item and lets you delete them'''
+class AdminClient(Resource):
+    """Admin"""
 
-    @ns.expect(parser)  # Attach the parser to expect input arguments
-    @ns.marshal_with(data_envelope(todo_model))  # Serialize the output with todo_model
+    @ns.expect(parser.user_parser)
+    @ns.marshal_with(data_envelope(user_serializer))
+    def post(self):
+        args = parser.user_parser.parse_args()
+        username = args["name"]
+        email = args["email"]
+
+        client = User()
+        user_id = client.generate_id()
+        client.user_id = user_id
+        client.username = username
+        client.email = email
+        if User.objects(email=email).first():
+            return format_response(None, 422, "fail", custom_ob="User Already Exits")
+
+        return format_response(client, 200, "success")
+
+
+@ns.route('/get-admin')
+class UserList(Resource):
     def get(self):
-        # Parse arguments from the request
-        args = parser.parse_args()
-        user = User(username=args["name"], email="akhil@gmail.com")
-        user.save()
-        print("Received argument:", args['name'])
+        """Get Users List"""
 
-        # Return the response serialized with the todo_model
-        return format_response(None, 200, "sucess", custom_ob={"name":"akhil"})
+        users = User.objects.only('username', 'email')
+        user_list = [{'username': user.username, 'email': user.email} for user in users]
+
+        return format_response(None, 200, "success", custom_ob=user_list)
+
+
+@ns.route('/submit')
+class Submit(Resource):
+    def get(self):
+        """Result"""
+
+        data = request.json
+        client = WebhookClient()
+        client.data = data
+        client.save()
+
+        return format_response(None, 200, "Success")
+

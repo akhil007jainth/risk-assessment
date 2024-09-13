@@ -9,4 +9,4 @@ api.add_namespace(pdf_nsd)
 api.add_namespace(set_question)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

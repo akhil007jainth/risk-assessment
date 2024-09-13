@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # Configure MongoEngine connection
 app.config['MONGODB_SETTINGS'] = {
-    'db': 'your_database_name',
+    'db': 'risk_assessment',
     'host': 'localhost',
     'port': 27017
 }

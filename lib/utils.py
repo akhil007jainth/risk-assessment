@@ -1,6 +1,5 @@
-import random
 import string
-
+import random
 
 def format_response(data, status_code, message=None, custom_ob=None, message_code_class=None, save=True):
     message_code = None
@@ -31,10 +30,10 @@ def format_response(data, status_code, message=None, custom_ob=None, message_cod
         success_flag = False
         if status_code == 500 and message is None:
             message = "ERROR_500"
-            message_code = 'contact_support'
+            message_code = 'contact_admin'
         elif status_code == 422 and message is None:
             message = "FAILED"
-            message_code = 'verification_failed'
+            message_code = 'failed'
 
     if message_code_class is not None:
         message_code = message_code_class.code
