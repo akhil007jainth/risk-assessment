@@ -1,6 +1,6 @@
 from datetime import datetime
 from lib.utils import generate_id
-from mongoengine import Document, StringField, DateTimeField
+from mongoengine import Document, StringField, DateTimeField, DictField
 
 
 class User(Document):
@@ -15,3 +15,7 @@ class User(Document):
     @classmethod
     def generate_id(cls):
         return generate_id(cls.prepend_string)
+
+
+class WebhookClient(Document):
+    data = DictField()

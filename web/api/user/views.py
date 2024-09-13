@@ -1,21 +1,22 @@
+from flask import request
 from flask_restx import Resource
 
 from app import api
 from lib.general_utils import data_envelope
 from lib.utils import format_response
 from web.api.user import parser
-from web.api.user.serializer import admin_serializer
-from web.models.main import User
+from web.api.user.serializer import user_serializer
+from web.models.main import User, WebhookClient
 
 ns = api.namespace('admin', description='User Admin')
 
 
 @ns.route('/init')
-class AdminClient(Resource):
-    """Admin"""
+class UserClient(Resource):
+    """User"""
 
     @ns.expect(parser.user_parser)
-    @ns.marshal_with(data_envelope(admin_serializer))
+    @ns.marshal_with(data_envelope(user_serializer))
     def post(self):
         args = parser.user_parser.parse_args()
         username = args["name"]
@@ -41,3 +42,17 @@ class UserList(Resource):
         user_list = [{'username': user.username, 'email': user.email} for user in users]
 
         return format_response(None, 200, "success", custom_ob=user_list)
+
+
+@ns.route('/submit')
+class Submit(Resource):
+    def get(self):
+        """Result"""
+
+        data = request.json
+        client = WebhookClient()
+        client.data = data
+        client.save()
+
+        return format_response(None, 200, "Success")
+
