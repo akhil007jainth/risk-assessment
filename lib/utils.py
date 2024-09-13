@@ -1,6 +1,5 @@
-
-
-
+import random
+import string
 
 
 def format_response(data, status_code, message=None, custom_ob=None, message_code_class=None, save=True):
@@ -53,3 +52,7 @@ def format_response(data, status_code, message=None, custom_ob=None, message_cod
 
     return response_json
 
+
+def generate_id(prepend_string):
+    charset = string.ascii_lowercase + string.ascii_letters
+    return prepend_string + "_" + "".join([random.choice(charset) for _ in range(20)])
