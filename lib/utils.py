@@ -1,8 +1,4 @@
 
-
-
-
-
 def format_response(data, status_code, message=None, custom_ob=None, message_code_class=None, save=True):
     message_code = None
     if data is not None:
@@ -52,4 +48,3 @@ def format_response(data, status_code, message=None, custom_ob=None, message_cod
                      }, status_code)
 
     return response_json
-

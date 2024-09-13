@@ -5,31 +5,33 @@ from lib.utils import format_response
 from lib.general_utils import data_envelope
 from web.models.main import User
 
-ns = api.namespace('todos', description='Todo operations')
+ns = api.namespace('admin', description='User Admin')
 
 # Define the response model for serialization
-todo_model = api.model('Todo', {
-    'name': fields.String(required=True, description='The todo item'),
+admin_serializer = api.model('Admin', {
+    'username': fields.String(required=True, description='Admin Name'),
+    'email': fields.String(required=True, description='Admin Email')
 })
 
 # Create a request parser for input data
 parser = reqparse.RequestParser()
-parser.add_argument('name', type=str, required=True, help='Name of the todo item')
-
+parser.add_argument('name', type=str, required=True, help='Admin Name')
+parser.add_argument('email', type=str, required=True, help='Admin Email')
 
 
 @ns.route('/init')
-class TodoResource(Resource):
-    '''Show a single todo item and lets you delete them'''
+class AdminClient(Resource):
+    """Admin"""
 
-    @ns.expect(parser)  # Attach the parser to expect input arguments
-    @ns.marshal_with(data_envelope(todo_model))  # Serialize the output with todo_model
+    @ns.expect(parser)
+    @ns.marshal_with(data_envelope(admin_serializer))
     def get(self):
-        # Parse arguments from the request
         args = parser.parse_args()
-        user = User(username=args["name"], email="akhil@gmail.com")
-        user.save()
-        print("Received argument:", args['name'])
+        username = args["name"]
+        email = args["email"]
 
-        # Return the response serialized with the todo_model
-        return format_response(None, 200, "sucess", custom_ob={"name":"akhil"})
+        client = User()
+        client.username = username
+        client.email = email
+
+        return format_response(client, 200, "success")
