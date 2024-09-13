@@ -33,7 +33,7 @@ class AdminClient(Resource):
         return format_response(client, 200, "success")
 
 
-@ns.route('/get-admin')
+@ns.route('/get-users')
 class UserList(Resource):
     def get(self):
         """Get Users List"""
