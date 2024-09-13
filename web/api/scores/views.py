@@ -1,6 +1,4 @@
 from enum import Enum
-
-from flask import request
 from flask_restx import Api, Resource, fields, reqparse
 from app import app, api
 from lib.utils import format_response, generate_id
