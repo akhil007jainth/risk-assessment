@@ -82,3 +82,26 @@ class GetQuestion(Resource):
         rv = CalculatePromptExecutor.execute(answers, questions_x)
 
         return format_response(None, 200, "Success", custom_ob={"data": rv})
+
+
+question_parser = reqparse.RequestParser()
+question_parser.add_argument("question_id", type=str, required=True, help='Question ID')
+
+
+@ns.route('/get-question')
+class GetQuestion(Resource):
+    @ns.expect(question_parser)
+    def get(self):
+        """Fetches a question by its ID."""
+
+        args = question_parser.parse_args()
+        question_id = args['question_id']
+        db = []
+        questions = Question.objects(question__question_id=question_id).first()
+        if not questions:
+            return format_response(None, 400, "Question Not Found")
+        for data in questions.question:
+            if data["question_id"] == question_id:
+                db.append(data)
+
+        return format_response(db, 200, "Success", save=False)
