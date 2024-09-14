@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 from flask_restx import Api, Resource, fields, reqparse
 from app import app, api
@@ -82,3 +83,14 @@ class GetQuestion(Resource):
         rv = CalculatePromptExecutor.execute(answers, questions_x)
 
         return format_response(None, 200, "Success", custom_ob={"data": rv})
+
+
+@ns.route('/question-list/<string:doc_id>')
+class QuestionList(Resource):
+    def get(self, doc_id):
+        document = Question.objects(question_document_id=doc_id).first()
+
+        res = [q['raw_ques']['question'] for q in document['questions']]
+
+        return format_response(None, 200, 'success', custom_ob=res)
+
