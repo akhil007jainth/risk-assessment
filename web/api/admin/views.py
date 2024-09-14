@@ -27,6 +27,7 @@ class AdminClient(Resource):
         client.user_id = user_id
         client.full_name = full_name
         client.email = email
+
         if User.objects(email=email).first():
             return format_response(None, 422, "fail", custom_ob="User Already Exits")
 

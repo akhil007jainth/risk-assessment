@@ -3,7 +3,8 @@ from flask_restx import Api, Resource, fields, reqparse
 from app import app, api
 from lib.utils import format_response, generate_id
 from lib.general_utils import data_envelope
-from web.models.question_model import Question
+from web.models.question_model import Question, QuestionDetails
+from lib.claude_prompting.base import CalculatePromptExecutor
 
 ns = api.namespace('questions', description='question operations')
 
@@ -30,7 +31,7 @@ parser.add_argument('categories', type=str, choices=[cat.value for cat in Catego
 parser.add_argument('categories_description', type=str, required=True, help='Categories of Quiz')
 
 
-@ns.route('/set-score')
+@ns.route('/insert-question')
 class SetQuestion(Resource):
 
     @ns.expect(parser)
@@ -43,31 +44,20 @@ class SetQuestion(Resource):
         categories_description= args['categories_description']
         data = data[0]
 
-        questions_to_save = []
+        question_ = Question()
+        question_.question_document_id = Question.generate_id("question_doc_id")
+        question_.categories = categories
+        question_.categories_description = categories_description
 
         for question_data in data:
-            question_text = question_data.get('question')
-            options = question_data.get('options')
-            answer = question_data.get('answer')
-            score = question_data.get('score')
+            nes_ques = QuestionDetails()
+            nes_ques.question_id = Question.generate_id("question_id")
+            nes_ques.raw_ques = question_data
+            question_.questions.append(nes_ques)
 
-            questions_to_save.append({
-                'question_id': Question.generate_id(),
-                'question': question_text,
-                'options': options,
-                'answer': answer,
-                'score': score
-            })
+        question_.save()
 
-        question_collection = Question(
-            question_documents_id=Question.generate_id(),
-            question=questions_to_save,
-            categories=categories,
-            categories_description=categories_description
-        )
-        question_collection.save()
-
-        return format_response(question_collection, 200, "success")
+        return format_response(question_, 200, "success")
 
 
 parser_1 = reqparse.RequestParser()
@@ -81,11 +71,14 @@ class GetQuestion(Resource):
     def post(self):
         args = parser_1.parse_args()
         doc_id = args['question_documents_id']
-        question_answer = args['data']
-        question = Question.objects(question_documents_id=doc_id).first()
+        answers = args['data']
+        question = Question.objects(question_document_id=doc_id).first()
+
         if not question:
             return format_response(None, 400, "Document's Id Not Exit")
 
-        response = question.question
+        questions_x = [i.to_mongo().to_dict() for i in question.questions]
 
-        return format_response(None, 200, "Success")
+        rv = CalculatePromptExecutor.execute(answers, questions_x)
+
+        return format_response(None, 200, "Success", custom_ob={"data": rv})
