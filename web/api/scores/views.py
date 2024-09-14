@@ -80,8 +80,7 @@ class GetQuestion(Resource):
 
         xdata = questions.to_mongo().to_dict()
 
-
-        return format_response(None, 200, "Success", custom_ob={"data": rv})
+        return format_response(None, 200, "Success", custom_ob={"data": xdata})
 
 
 @ns.route('/question-list')
