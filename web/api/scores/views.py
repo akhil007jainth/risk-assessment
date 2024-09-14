@@ -95,3 +95,26 @@ class QuestionList(Resource):
 
         return format_response(None, 200, "Success", custom_ob={"data": data})
 
+
+parser_1 = reqparse.RequestParser()
+parser_1.add_argument("question_documents_id", type=str, required=True, help='Categories of Quiz')
+parser_1.add_argument('data', type=list, location='json', required=True, help='Name of the todo item', action="append")
+
+
+@ns.route('/get-score')
+class GetQuestion(Resource):
+    @ns.expect(parser_1)
+    def post(self):
+        args = parser_1.parse_args()
+        doc_id = args['question_documents_id']
+        answers = args['data']
+        question = Question.objects(question_document_id=doc_id).first()
+
+        if not question:
+            return format_response(None, 400, "Document's Id Not Exit")
+
+        questions_x = [i.to_mongo().to_dict() for i in question.questions]
+
+        rv = CalculatePromptExecutor.execute(answers, questions_x)
+
+        return format_response(None, 200, "Success", custom_ob={"data": rv})
