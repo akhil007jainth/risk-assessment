@@ -85,23 +85,22 @@ class GetQuestion(Resource):
 
 
 question_parser = reqparse.RequestParser()
-question_parser.add_argument("question_id", type=str, required=True, help='Question ID')
+question_parser.add_argument("question_doc_id", type=str, required=True, help='Question ID')
 
 
 @ns.route('/get-question')
 class GetQuestion(Resource):
     @ns.expect(question_parser)
-    def get(self):
+    def post(self):
         """Fetches a question by its ID."""
 
         args = question_parser.parse_args()
-        question_id = args['question_id']
-        db = []
-        questions = Question.objects(question__question_id=question_id).first()
+        question_doc_id = args['question_doc_id']
+
+        questions = Question.objects(question_document_id=question_doc_id).exclude("id").first()
         if not questions:
             return format_response(None, 400, "Question Not Found")
-        for data in questions.question:
-            if data["question_id"] == question_id:
-                db.append(data)
 
-        return format_response(db, 200, "Success", save=False)
+        xdata = questions.to_mongo().to_dict()
+
+        return format_response(None, 200, "Success", custom_ob={"data": xdata})
