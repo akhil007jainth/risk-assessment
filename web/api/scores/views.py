@@ -60,25 +60,23 @@ class SetQuestion(Resource):
         return format_response(question_, 200, "success")
 
 
-parser_1 = reqparse.RequestParser()
-parser_1.add_argument("question_documents_id", type=str, required=True, help='Categories of Quiz')
-parser_1.add_argument('data', type=list, location='json', required=True, help='Name of the todo item', action="append")
+question_parser = reqparse.RequestParser()
+question_parser.add_argument("question_doc_id", type=str, required=True, help='Question ID')
 
 
-@ns.route('/get-score')
+@ns.route('/get-question')
 class GetQuestion(Resource):
-    @ns.expect(parser_1)
+    @ns.expect(question_parser)
     def post(self):
-        args = parser_1.parse_args()
-        doc_id = args['question_documents_id']
-        answers = args['data']
-        question = Question.objects(question_document_id=doc_id).first()
+        """Fetches a question by its ID."""
 
-        if not question:
-            return format_response(None, 400, "Document's Id Not Exit")
+        args = question_parser.parse_args()
+        question_doc_id = args['question_doc_id']
 
-        questions_x = [i.to_mongo().to_dict() for i in question.questions]
+        questions = Question.objects(question_document_id=question_doc_id).exclude("id").first()
+        if not questions:
+            return format_response(None, 400, "Question Not Found")
 
-        rv = CalculatePromptExecutor.execute(answers, questions_x)
+        xdata = questions.to_mongo().to_dict()
 
-        return format_response(None, 200, "Success", custom_ob={"data": rv})
+        return format_response(None, 200, "Success", custom_ob={"data": xdata})
