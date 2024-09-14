@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 from flask_restx import Api, Resource, fields, reqparse
 from app import app, api
@@ -41,7 +42,7 @@ class SetQuestion(Resource):
         args = parser.parse_args()
         data = args['data']
         categories = args['categories']
-        categories_description= args['categories_description']
+        categories_description = args['categories_description']
         data = data[0]
 
         question_ = Question()
@@ -79,4 +80,19 @@ class GetQuestion(Resource):
 
         xdata = questions.to_mongo().to_dict()
 
+
+        return format_response(None, 200, "Success", custom_ob={"data": rv})
+
+
+@ns.route('/question-list')
+class QuestionList(Resource):
+    def get(self):
+        document = Question.objects().exclude("id").all()
+
+        if not document:
+            return format_response(None, 422, 'Fail')
+
+        data = [i.to_mongo().to_dict() for i in document]
+
         return format_response(None, 200, "Success", custom_ob={"data": xdata})
+
