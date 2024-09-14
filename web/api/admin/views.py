@@ -42,14 +42,14 @@ class UserList(Resource):
     def get(self):
         """Get Users List"""
 
-        users = User.objects.only('full_name', 'email')
-        user_list = [{'full_name': user.full_name, 'email': user.email} for user in users]
+        users = User.objects.only('full_name', 'email', 'status', 'created_at')
+        user_list = [{'full_name': user.full_name, 'email': user.email, 'status': user.status, 'created_at': user.created_at.strftime('%Y-%m-%dT%H:%M:%S')} for user in users]
 
         return format_response(None, 200, "success", custom_ob=user_list)
 
 
 @ns.route('/webhook')
-class webhook(Resource):
+class Webhook(Resource):
     def get(self):
         """Result"""
 
