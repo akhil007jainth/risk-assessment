@@ -18,7 +18,7 @@ class Category(Enum):
 
 # Define the response model for serialization
 question_model = api.model('Data', {
-    'question_documents_id': fields.String(required=True, description='The question document Id'),
+    'question_document_id': fields.String(required=True, description='The question document Id'),
     'categories': fields.String(required=True, description='The document categories'),
     'categories_description': fields.String(required=True, description='The categories description'),
 })

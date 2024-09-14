@@ -9,6 +9,7 @@ class FlowConnectLink(Document):
     client_id = StringField(required=True)
     email = EmailField(required=True)
     connect_link = StringField()
+    question_id = StringField()
     token_id = StringField()
     is_expired = BooleanField(default=False)
 
