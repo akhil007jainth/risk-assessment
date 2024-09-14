@@ -6,11 +6,13 @@ from mongoengine import Document, StringField, DateTimeField, DictField
 class User(Document):
     prepend_string = "user"
 
+    STATUS_CHOICES = {"Pending", "Inactive", "Completed", "Failed"}
+
     user_id = StringField(required=True, unique=True)
-    username = StringField(required=True)
+    full_name = StringField(required=True)
     email = StringField(required=True, unique=True)
     created_at = DateTimeField(default=datetime.utcnow)
-    status = StringField()
+    status = StringField(default="Inactive", choices=STATUS_CHOICES)
 
     @classmethod
     def generate_id(cls):
