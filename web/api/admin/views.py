@@ -22,6 +22,9 @@ class AdminClient(Resource):
         full_name = args["name"]
         email = args["email"]
 
+        if not full_name or not email:
+            return format_response(None, 400, message="Name or Email can not be empty")
+
         client = User()
         user_id = client.generate_id()
         client.user_id = user_id
