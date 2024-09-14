@@ -93,5 +93,5 @@ class QuestionList(Resource):
 
         data = [i.to_mongo().to_dict() for i in document]
 
-        return format_response(None, 200, "Success", custom_ob={"data": xdata})
+        return format_response(None, 200, "Success", custom_ob={"data": data})
 
