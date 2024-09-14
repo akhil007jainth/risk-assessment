@@ -11,6 +11,7 @@ class FlowConnectLink(Document):
     connect_link = StringField()
     question_id = StringField()
     token_id = StringField()
+    category = StringField()
     is_expired = BooleanField(default=False)
 
     @classmethod

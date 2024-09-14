@@ -26,6 +26,7 @@ class Question(Document):
     question_document_id = StringField(required=True)
     questions = EmbeddedDocumentListField(QuestionDetails)
     categories = StringField()
+    file_name = StringField()
     categories_description = StringField()
 
     @classmethod

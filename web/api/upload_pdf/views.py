@@ -50,6 +50,7 @@ class UploadPdf(Resource):
         question_ = Question()
         question_.question_document_id = Question.generate_id("question_doc_id")
         question_.categories = categories
+        question_.file_name = file_name
         question_.categories_description = categories_description
 
         for question_data in rv:

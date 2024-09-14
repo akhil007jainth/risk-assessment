@@ -8,7 +8,7 @@ from flask_restx import Resource, reqparse
 from app import api
 from lib.general_utils import data_envelope
 from lib.utils import format_response
-from web.api.admin import parser
+from web.api.admin import parser as init_parser
 from web.api.admin.serializer import user_serializer
 from web.api.magic_link.utils import create_magic_link
 from web.models.main import User, WebhookClient
@@ -20,10 +20,10 @@ ns = api.namespace('admin', description='User Admin')
 class AdminClient(Resource):
     """Admin"""
 
-    @ns.expect(parser.user_parser)
+    @ns.expect(init_parser.user_parser)
     @ns.marshal_with(data_envelope(user_serializer))
     def post(self):
-        args = parser.user_parser.parse_args()
+        args = init_parser.user_parser.parse_args()
         full_name = args["name"]
         email = args["email"]
 
@@ -47,10 +47,27 @@ class UserList(Resource):
     def get(self):
         """Get Users List"""
 
-        users = User.objects.only('full_name', 'email', 'status', 'created_at')
+        users = User.objects().all()
         user_list = [{'full_name': user.full_name, 'email': user.email, 'status': user.status, 'created_at': user.created_at.strftime('%Y-%m-%dT%H:%M:%S')} for user in users]
 
         return format_response(None, 200, "success", custom_ob=user_list)
+
+
+parser_user = reqparse.RequestParser()
+parser_user.add_argument("email", type=str, required=True, help="Super Link")
+
+
+@ns.route('/user-details')
+class UserDetails(Resource):
+    @ns.expect(parser_user)
+    def get(self):
+        """Get Users List"""
+        args = parser.parse_args()
+        email = args['email']
+
+        users = User.objects(email=email).exclude("id").first()
+
+        return format_response(None, 200, "success", custom_ob=users.to_mongo().to_dict())
 
 
 @ns.route('/webhook')
@@ -66,6 +83,10 @@ class Webhook(Resource):
         client.data = data
         client.save()
 
+        user = User.objects(user_id=client.data["user_id"]).first()
+        user.raw_data = data
+        user.save()
+
         return format_response(None, 200, "Success")
 
 
@@ -73,6 +94,7 @@ class Webhook(Resource):
 parser = reqparse.RequestParser()
 parser.add_argument('email', type=str, required=True, help='Email')
 parser.add_argument('question_id', type=str, required=True, help='question_id')
+parser.add_argument('category', type=str, required=True, help='category')
 
 
 @ns.route("/send-assessment-email")
@@ -82,8 +104,9 @@ class SendAssessmentEmail(Resource):
         args = parser.parse_args()
         email = args["email"]
         question_id = args["question_id"]
+        category = args["category"]
 
-        link = create_magic_link(email, question_id)
+        link = create_magic_link(email, question_id, category)
 
         url = "https://api.resend.com/emails"
 

@@ -63,4 +63,4 @@ class VerifyMagicLink(Resource):
         if not secrets.compare_digest(obj.token_id, verification_token):
             return format_response(None, 422, message="Invalid email verification token")
 
-        return redirect(f"https://guided-sensibly-burro.ngrok-free.app/form?{obj.question_id}")
+        return redirect(f"https://ocelot-flying-safely.ngrok-free.app/form?doc_question_id={obj.question_id}&email={obj.email}&category={obj.category}")

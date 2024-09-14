@@ -24,12 +24,13 @@ class FlowLinkConnect:
         return self.verification_token, self.verification_url
 
 
-def create_magic_link(root_user_email, question_id):
+def create_magic_link(root_user_email, question_id, category):
 
     flow_connect_link = FlowConnectLink()
     flow_connect_link.client_id = flow_connect_link.generate_id()
     flow_connect_link.email = root_user_email
     flow_connect_link.question_id = question_id
+    flow_connect_link.category = category
     flow_connect_link.save()
 
     flow_link_data = FlowLinkConnect(flow_connect_link.client_id)
