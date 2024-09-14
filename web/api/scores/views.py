@@ -42,7 +42,7 @@ class SetQuestion(Resource):
         args = parser.parse_args()
         data = args['data']
         categories = args['categories']
-        categories_description= args['categories_description']
+        categories_description = args['categories_description']
         data = data[0]
 
         question_ = Question()
@@ -89,6 +89,8 @@ class GetQuestion(Resource):
 class QuestionList(Resource):
     def get(self, doc_id):
         document = Question.objects(question_document_id=doc_id).first()
+        if not document:
+            return format_response(None, 422, 'Fail')
 
         res = [q['raw_ques']['question'] for q in document['questions']]
 

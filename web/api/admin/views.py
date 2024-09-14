@@ -54,6 +54,9 @@ class webhook(Resource):
         """Result"""
 
         data = request.json
+        if not data:
+            return format_response(None, 400, "Fail")
+
         client = WebhookClient()
         client.data = data
         client.save()
