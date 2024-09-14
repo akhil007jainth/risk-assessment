@@ -85,14 +85,15 @@ class GetQuestion(Resource):
         return format_response(None, 200, "Success", custom_ob={"data": rv})
 
 
-@ns.route('/question-list/<string:doc_id>')
+@ns.route('/question-list')
 class QuestionList(Resource):
-    def get(self, doc_id):
-        document = Question.objects(question_document_id=doc_id).first()
+    def get(self):
+        document = Question.objects().exclude("id").all()
+
         if not document:
             return format_response(None, 422, 'Fail')
 
-        res = [q['raw_ques']['question'] for q in document['questions']]
+        data = [i.to_mongo().to_dict() for i in document]
 
-        return format_response(None, 200, 'success', custom_ob=res)
+        return format_response(None, 200, 'success', custom_ob=data)
 
