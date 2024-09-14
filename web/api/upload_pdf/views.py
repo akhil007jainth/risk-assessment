@@ -14,6 +14,7 @@ ns = api.namespace('pdf', description='Upload PDF')
 
 # Create a request parser for input data
 parser = reqparse.RequestParser()
+parser.add_argument('filename', type=str, help="Name of file")
 parser.add_argument('file', location='files', type=FileStorage, required=True, help='PDF file to be processed')
 parser.add_argument('categories', location='form', type=str, required=True, help='PDF file to be processed')
 parser.add_argument('categories_description', location='form', type=str, required=True, help='PDF file to be processed')
@@ -35,6 +36,7 @@ class UploadPdf(Resource):
     def post(self):
         # Parse arguments from the request
         args = parser.parse_args()
+        file_name = args['filename']
         pdf_file = args['file']
         categories = args['categories']
         categories_description = args['categories_description']
